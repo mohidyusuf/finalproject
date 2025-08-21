@@ -1,8 +1,36 @@
-- name: Restore dependencies
-  run: dotnet restore CarRentalApp/CarRentalApp.sln
+name: .NET Build
 
-- name: Build
-  run: dotnet build CarRentalApp/CarRentalApp.sln --no-restore --configuration Release
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-- name: Run tests
-  run: dotnet test CarRentalApp/CarRentalApp.sln --no-build --verbosity normal
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout your repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup .NET 8
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # Step 3: Restore all projects
+      - name: Restore dependencies
+        run: dotnet restore CarRentalApp/CarRentalApp.sln
+
+      # Step 4: Build solution
+      - name: Build solution
+        run: dotnet build CarRentalApp/CarRentalApp.sln --no-restore --configuration Release
+
+      # Step 5: Run tests (if any)
+      - name: Run tests
+        run: dotnet test CarRentalApp/CarRentalApp.sln --no-build --verbosity normal
