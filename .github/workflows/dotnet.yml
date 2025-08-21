@@ -1,45 +1,8 @@
-name: .NET 8 Build
+- name: Restore dependencies
+  run: dotnet restore CarRentalApp/CarRentalApp/CarRentalApp.sln
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+- name: Build solution
+  run: dotnet build CarRentalApp/CarRentalApp/CarRentalApp.sln --no-restore --configuration Release
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      # 1️⃣ Checkout code
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # 2️⃣ Setup .NET 8
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      # 3️⃣ Cache NuGet packages to speed up restore
-      - name: Cache NuGet packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
-      # 4️⃣ Restore dependencies
-      - name: Restore dependencies
-        run: dotnet restore CarRentalApp/CarRentalApp/CarRentalApp.sln
-
-      # 5️⃣ Build solution
-      - name: Build solution
-        run: dotnet build CarRentalApp/CarRentalApp/CarRentalApp.sln --configuration Release --no-restore
-
-      # 6️⃣ Run tests (if any)
-      - name: Run tests
-        run: dotnet test CarRentalApp/CarRentalApp/CarRentalApp.sln --no-build --verbosity normal
+- name: Run tests
+  run: dotnet test CarRentalApp/CarRentalApp/CarRentalApp.sln --no-build --verbosity normal
