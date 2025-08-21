@@ -1,0 +1,19 @@
+﻿@page "/logout"
+@using BlazorGoogleMongo.Authentication
+@using Microsoft.AspNetCore.Authentication
+@inject NavigationManager NavManager
+
+<h3>LogoutPage</h3>
+
+@code {
+
+    [CascadingParameter]
+    public HttpContext? httpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await httpContext!.SignOutAsync(AppConstants.AuthScheme);
+        NavManager.NavigateTo("/");
+    }
+
+}

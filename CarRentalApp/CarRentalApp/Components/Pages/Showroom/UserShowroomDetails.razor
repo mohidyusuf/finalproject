@@ -1,0 +1,223 @@
+﻿@page "/showroomdetails/{BusinessId}"
+@layout UserLayout
+@inject IAboutShowroomService ShowroomService
+@inject ICarPackageService CarPackageService
+@inject IBusPackageService ServiceBusPackage
+@inject IHiacePackageService ServiceHiacePackage
+@rendermode InteractiveServer
+
+<div class="container">
+    @if (Showroom == null)
+    {
+        <div class="alert alert-warning text-center">
+            Showroom not found.
+        </div>
+    }
+    else
+    {
+        <!-- Cover & Logo Section -->
+
+        <div class="bg-danger">
+            <img src="@(!string.IsNullOrEmpty(Showroom.Cover) ? Showroom.Cover : "/images/defaultcover.jpg")" style="max-height: 400px; object-fit: cover; width:100%;" />
+        </div>
+
+        <div class="bg-dark text-white" >
+            <div class="row">
+                <div class="col-md-2 ps-5" style="margin-top:-60px">
+                    <img src="@(!string.IsNullOrEmpty(Showroom.Logo) ? Showroom.Logo : "/images/defaultlogo.jpg")"
+                         class="rounded-circle border border-3 border-white shadow"
+                         style="width:120px;height:120px;object-fit:cover;" />
+                </div>
+                <div class="col-md-10">
+                    <div class="row pt-2">
+                        <div class="col-md-4">
+                            <h2 class="fw-bold">@Showroom.ShowroomName</h2>
+                         
+                        </div>
+                        <div class="col-md-4 pt-1">
+                            <span class="small">📍 @Showroom.Address,@Showroom.City,@Showroom.Country </span>
+                        </div>
+                        <div class="col-md-4 pt-1">
+                            <span class="small pe-2"> 📞@Showroom.ContactPhone </span>                    
+                                @if (!string.IsNullOrEmpty(Showroom.ContactEmail))
+                                {
+                                <div class="d-flex align-items-center small">
+                                    <span class="me-1">✉️</span>
+                                    <span>@Showroom.ContactEmail</span>
+                                </div>
+                            }
+                        
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+      
+        <!-- Tabs -->
+        <div class="text-ent mt-5">
+            <div class="btn-group">
+                <button class="btn @(ActiveTab == "Cars" ? "btn-dark" : "btn-outline-dark")" @onclick="LoadCarPackages">Cars</button>
+                <button class="btn @(ActiveTab == "Buses" ? "btn-dark" : "btn-outline-dark")" @onclick="LoadBusPackages">Buses</button>
+                <button class="btn @(ActiveTab == "Hiaces" ? "btn-dark" : "btn-outline-dark")" @onclick="LoadHiacePackages">Hiaces</button>
+            </div>
+        </div>
+
+        <!-- Package Results -->
+        <div class="mt-5">
+            @if (ActiveTab == "Cars")
+            {
+                <h3 class="mb-3">Car Packages</h3>
+                <div class="row">
+                    @if (CarPackages != null && CarPackages.Count > 0)
+                    {
+                        @foreach (var item in CarPackages)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="@item.CarImage" class="card-img-top" style="height:200px; object-fit:cover;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">@item.CarMake @item.CarModel</h5>
+                                        <p><strong>Price:</strong> @item.Price</p>
+                                        <p><strong>Duration:</strong> @item.Duration</p>
+                                        <p><strong>With Driver:</strong> @(item.WithDriver ? "Yes" : "No")</p>
+                                    </div>
+                                    <NavLink class="btn btn-primary" href="@($"/cardetails/{item.CarId}")">
+                                        View Car Detail
+                                    </NavLink>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">No car packages available.</div>
+                    }
+                </div>
+            }
+            else if (ActiveTab == "Buses")
+            {
+                <h3 class="mb-3">Bus Packages</h3>
+                <div class="row">
+                    @if (BusPackages != null && BusPackages.Count > 0)
+                    {
+                        @foreach (var item in BusPackages)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="@item.BusImage" class="card-img-top" style="height:200px; object-fit:cover;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">@item.BusMake @item.BusModel</h5>
+                                        <p><strong>Price:</strong> @item.Price</p>
+                                        <p><strong>Duration:</strong> @item.Duration</p>
+                                        <p><strong>With Driver:</strong>@(item.WithDriver ? "Yes" : "No")</p>
+                                    </div>
+                                    <NavLink class="btn btn-primary" href="@($"/busdetails/{item.BusId}")">
+                                        View Bus Detail
+                                    </NavLink>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">No bus packages available.</div>
+                    }
+                </div>
+            }
+            else if (ActiveTab == "Hiaces")
+            {
+                <h3 class="mb-3">Hiace Packages</h3>
+                <div class="row">
+                    @if (HiacePackages != null && HiacePackages.Count > 0)
+                    {
+                        @foreach (var item in HiacePackages)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="@item.HiaceImage" class="card-img-top" style="height:200px; object-fit:cover;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">@item.HiaceMake @item.HiaceModel</h5>
+                                        <p><strong>Price:</strong> @item.Price</p>
+                                        <p><strong>Duration:</strong> @item.Duration</p>
+                                        <p><strong>With Driver:</strong>@(item.WithDriver ? "Yes" : "No")</p>
+                                    </div>
+                                    <NavLink class="btn btn-primary" href="@($"/hiacedetails/{item.HiaceId}")">
+                                        View Hiace Detail
+                                    </NavLink>
+
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">No hiace packages available.</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+
+<section class="container-fluid bg-dark">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card bg-transparent text-secondary">
+                    <div class="card-body">
+                        <div>
+                            <img src="/logowhitered.png" height="20" />
+
+                            <span class="small">&copy; 2025 GoRent. All rights reserved.</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public string BusinessId { get; set; } = string.Empty;
+    private EntAboutShowroom? Showroom;
+
+    private List<EntCarPackage> CarPackages = new();
+    private List<EntBusPackage> BusPackages = new();
+    private List<EntHiacePackage> HiacePackages = new();
+
+    private string ActiveTab = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Showroom = await ShowroomService.GetByBusinessId(BusinessId);
+       await LoadCarPackages();
+
+    }
+
+    private async Task LoadCarPackages()
+    {
+        CarPackages = await CarPackageService.GetAllByBusinessIdAsync(BusinessId);
+        ActiveTab = "Cars";
+    }
+
+    private async Task LoadBusPackages()
+    {
+        BusPackages = await ServiceBusPackage.GetAllByBusinessIdAsync(BusinessId);
+        ActiveTab = "Buses";
+    }
+
+    private async Task LoadHiacePackages()
+    {
+        HiacePackages = await ServiceHiacePackage.GetAllByBusinessIdAsync(BusinessId);
+        ActiveTab = "Hiaces";
+    }
+}

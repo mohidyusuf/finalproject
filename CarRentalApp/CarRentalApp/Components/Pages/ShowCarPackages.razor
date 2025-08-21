@@ -1,0 +1,80 @@
+﻿@page "/showcarpackages"
+@rendermode InteractiveServer
+@inject ICarPackageService ServiceCarPackage
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<h3>Packages</h3>
+
+<a href="showcars" class="btn btn-primary btn-sm mb-2">
+    + Add New Package
+</a>
+
+@if (allCarPackages == null)
+{
+    <p>Loading Packages...</p>
+}
+else
+{
+    <div style="margin-bottom: 30px;">
+        <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+
+                    <th style="padding: 8px; border: 1px solid #ddd;">Make</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Model</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Duration</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">With Driver</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Image </th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Actions</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var car in allCarPackages)
+                {
+                    <tr style="border: 1px solid #ddd;">
+
+
+                        <td style="padding: 8px;">@car.CarMake</td>
+                        <td style="padding: 8px;">@car.CarModel</td>
+                        <td style="padding: 8px;">RS.@car.Price</td>
+                        <td style="padding: 8px;">@car.Duration</td>
+                        <td style="padding: 8px;">@(car.WithDriver ? "Yes" : "No")</td>
+                        <td style="padding: 8px;"><img src=" @car.CarImage" width="50" /></td>
+                        <td> <button @onclick="(() => DeleteCarPackage(car.Id))" class="btn btn-sm btn-danger">Delete</button></td>
+
+                        <td style="padding: 8px;"> </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a href="showcars" class="btn btn-secondary">Cancel</a>
+}
+
+@code {
+    private List<EntCarPackage> allCarPackages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckUserAuthenticated() && await CheckService.CheckBusinessExists())
+        {
+            var businessId = await CheckService.GetBusinessIdAsync();
+            allCarPackages = await ServiceCarPackage.GetAllByBusinessIdAsync(businessId);
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+
+    private async Task DeleteCarPackage(string id)
+    {
+        await ServiceCarPackage.DeleteAsync(id);
+        var businessId = await CheckService.GetBusinessIdAsync();
+        allCarPackages = await ServiceCarPackage.GetAllByBusinessIdAsync(businessId);
+    }
+}

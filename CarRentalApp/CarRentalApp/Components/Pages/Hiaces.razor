@@ -1,0 +1,95 @@
+﻿@page "/showhiaces"
+@rendermode InteractiveServer
+@inject IHiaceService HiaceService
+@inject NavigationManager NavManager
+
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<h3>Hiaces</h3>
+
+<a href="addhiaces" class="btn btn-primary btn-sm mb-2">
+    + Add New Hiace
+</a>
+
+@if (allHiaces == null)
+{
+    <p>Loading Hiaces...</p>
+}
+else
+{
+    <div style="margin-bottom: 30px;">
+        <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">Make</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Model</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Color</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Cargo Capacity</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">AC</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Rear Camera</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Image </th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hiace in allHiaces)
+                {
+                    <tr style="border: 1px solid #ddd;">
+                        <td style="padding: 8px;">@hiace.Make</td>
+                        <td style="padding: 8px;">@hiace.Model</td>
+                        <td style="padding: 8px;">@hiace.Color</td>
+                        <td style="padding: 8px;">@hiace.CargoCapacityKg kg</td>
+                        <td style="padding: 8px;">@(hiace.IsAC ? "Yes" : "No")</td>
+                        <td style="padding: 8px;">@(hiace.HasRearCamera ? "Yes" : "No")</td>
+                        <td style="padding: 8px;"><img src=" @hiace.Image" width="50" /></td>
+                        <td style="padding: 8px;">
+                            <button @onclick="() => EditHiace(hiace.Id)" class="btn btn-sm btn-primary">Edit</button>
+                            <button @onclick="(() => DeleteHiace(hiace.Id))" class="btn btn-sm btn-danger">Delete</button>
+                            <button @onclick="() => MakePackage(hiace.Id)" class="btn btn-sm btn-success">Make Package</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a href="showhiacepackages" class="btn btn-secondary">See Hiace Packages</a>
+}
+
+@code {
+    private List<EntHiace> allHiaces = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckUserAuthenticated() && await CheckService.CheckBusinessExists())
+        {
+            string BusinessId = await CheckService.GetBusinessId();
+            if (!string.IsNullOrEmpty(BusinessId))
+                allHiaces = await HiaceService.GetAllByIdAsync(BusinessId);
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+
+    private void EditHiace(string id)
+    {
+        NavManager.NavigateTo($"/addhiaces/{id}");
+    }
+
+    private async Task DeleteHiace(string id)
+    {
+        await HiaceService.DeleteAsync(id);
+        string BusinessId = await CheckService.GetBusinessId();
+        if (!string.IsNullOrEmpty(BusinessId))
+            allHiaces = await HiaceService.GetAllByIdAsync(BusinessId);
+    }
+
+    private void MakePackage(string HiaceId)
+    {
+        NavManager.NavigateTo($"/addhiacespackages/{HiaceId}");
+    }
+
+}

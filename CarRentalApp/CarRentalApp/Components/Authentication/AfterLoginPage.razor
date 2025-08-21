@@ -1,0 +1,91 @@
+﻿@page "/after-login"
+@using System.Security.Claims
+@using BlazorGoogleMongo.Authentication
+@using Entities
+@using Microsoft.AspNetCore.Authentication
+@inject NavigationManager NavManager
+@inject IUserService userService
+@inject IAboutShowroomService ShowroomService
+
+<h3>AfterLoginPage</h3>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? httpContext { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            return;
+
+        var name = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        var email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var picture = httpContext.User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+
+        if (email == null)
+            return;
+
+
+        var getUser = await userService.GetUserByEmail(email);
+
+        if (getUser == null)
+        {
+            var userCount = await userService.GetUserCount();
+
+            var newUser = new EntAppUser
+            {
+                Name = name,
+                Email = email,
+                Role = (userCount == 0) ? "Admin" : "User",
+
+            };
+
+            await userService.AddUser(newUser);
+        }
+
+        var _user = await userService.GetUserByEmail(email);
+
+        if (_user == null)
+            return;
+
+        // Make sure Role is never null
+        var userRole = _user.Role ?? "User";
+
+        EntAboutShowroom Business = await ShowroomService.GetShowroomById(_user.Id) ?? new EntAboutShowroom();
+
+        // Create claims
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()),
+            new Claim(ClaimTypes.GivenName, _user.Name ?? string.Empty),
+            new Claim(ClaimTypes.Email, _user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Role, userRole),
+            new Claim("BusinessId", Business!.Id ?? "")
+        };
+
+
+        // Sign in manually
+        var identity = new ClaimsIdentity(claims, AppConstants.AuthScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await httpContext.SignInAsync(AppConstants.AuthScheme, principal);
+
+        if (Business != null && !string.IsNullOrEmpty(Business.Id))
+        {
+
+            NavManager.NavigateTo("/myshowroom");
+        }
+        else
+        {
+            NavManager.NavigateTo("/createshowroom");
+        }
+
+
+
+
+
+        // Navigate to home page
+        NavManager.NavigateTo("/.");
+    }
+}

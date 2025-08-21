@@ -1,0 +1,102 @@
+﻿@page "/showcars"
+@rendermode InteractiveServer
+@inject ICarService CarService
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<h3>Cars</h3>
+
+<a href="addcars" class="btn btn-primary btn-sm mb-2">
+    + Add New Car
+</a>
+
+@if (allCars == null)
+{
+    <p>Loading cars...</p>
+}
+else
+{
+    <div style="margin-bottom: 30px;">
+        <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">Make</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Model</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Year</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Color</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Reg No.</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Image</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var car in allCars)
+                {
+                    <tr style="border: 1px solid #ddd;">
+                        <td style="padding: 8px;">@car.Make</td>
+                        <td style="padding: 8px;">@car.Model</td>
+                        <td style="padding: 8px;">@car.Year</td>
+                        <td style="padding: 8px;">@car.Color</td>
+                        <td style="padding: 8px;">@car.RegistrationNumber</td>
+                        <td style="padding: 8px;"><img src=" @car.Image" width="50" /></td>
+                        <td style="padding: 8px;">
+                            <button @onclick="() => EditCar(car.Id)" class="btn btn-sm btn-primary">Edit</button>
+                            <button @onclick="(() => DeleteCar(car.Id))" class="btn btn-sm btn-danger">Delete</button>
+                            <button @onclick="() => MakePackage(car.Id)" class="btn btn-sm btn-success">Make Package</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a href="showcarpackages" class="btn btn-secondary">See Car Packages</a>
+
+}
+
+@code {
+    private List<EntCar> allCars = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckUserAuthenticated() && await CheckService.CheckBusinessExists())
+        {
+            string BusinessId = await CheckService.GetBusinessId();
+            if (!string.IsNullOrEmpty(BusinessId))
+                allCars = await CarService.GetAllByIdAsync(BusinessId);
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+
+    }
+
+    private void EditCar(string id)
+    {
+        NavManager.NavigateTo($"/addcars/{id}");
+    }
+
+    private async Task DeleteCar(string id)
+    {
+        await CarService.DeleteAsync(id);
+
+        string BusinessId = await CheckService.GetBusinessId();
+        if (!string.IsNullOrEmpty(BusinessId))
+            allCars = await CarService.GetAllByIdAsync(BusinessId);
+        StateHasChanged();
+    }
+
+
+
+    private void MakePackage(string carId)
+    {
+        NavManager.NavigateTo($"/addcarspackages/{carId}");
+    }
+
+
+
+
+}

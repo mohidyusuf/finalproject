@@ -1,0 +1,194 @@
+﻿@page "/myshowroom"
+@rendermode InteractiveServer
+@inject IAboutShowroomService AboutShowroomService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+
+<div class="container mb-1">
+<h5 class="mb-4">Business information</h5>
+</div>
+
+@if (loading)
+{
+    <p>Loading showroom...</p>
+}
+else if (showroom == null)
+{
+    <div class="alert alert-warning">
+        You don’t have a showroom yet.
+        <button class="btn btn-primary" @onclick="GoToCreate">Create Showroom</button>
+    </div>
+}
+else
+
+{
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm border-0">
+
+                    
+                        <CoverImage coverImage="@CoverImageURl" Id="@c_Id" /> 
+
+                
+                    <div style="margin-top:-70px; margin-left:50px;">
+                        <LogoIamge logoImage="@LogoImageURl" Id="@l_Id" />
+                    </div>
+
+
+
+
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Business Name</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.ShowroomName
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Owner Name</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.OwnerName
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Description</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.Description
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Working Hours</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.OpeningTime till @showroom.ClosingTime
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Address</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.Address ,  @showroom.City , @showroom.Country
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Contact Information</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.ContactPhone |  @showroom.ContactEmail
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Facebook Url</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.FacebookUrl
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <span class="text-black-50 small">Instagram Url</span>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 p-1 small">
+                                    @showroom.InstagramUrl
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary mt-3" @onclick="GoToUpdate">@ButtonName</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+
+
+
+}
+
+@code {
+    private EntAboutShowroom? showroom = new();
+    private bool loading = true;
+    private string? UserId;
+    private string? c_Id;
+    private string? l_Id;
+    private string? CoverImageURl { get; set; }
+    private string? LogoImageURl { get; set; }
+
+    private string ButtonName = "Edit Showroom Information";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+
+        UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+        showroom = await AboutShowroomService.GetShowroomByUserId(UserId);
+        c_Id = showroom.Id;
+        if (!string.IsNullOrEmpty(showroom.Cover))
+        {
+            CoverImageURl = showroom.Cover;
+
+        }
+        else
+        {
+            CoverImageURl = "https://placehold.co/800x300/000000/FFFFFF/png?text=your+cover+image+here";
+        }
+        l_Id = showroom.Id;
+        if (!string.IsNullOrEmpty(showroom.Logo))
+        {
+            LogoImageURl = showroom.Logo;
+        }
+        else
+        {
+            LogoImageURl = "https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png";
+        }
+
+
+        loading = false;
+    }
+
+
+    private void GoToUpdate()
+    {
+        NavigationManager.NavigateTo("/editshowroomdetails");
+    }
+
+    private void GoToCreate()
+    {
+        NavigationManager.NavigateTo("/createshowroom");
+    }
+
+
+
+
+ 
+
+}

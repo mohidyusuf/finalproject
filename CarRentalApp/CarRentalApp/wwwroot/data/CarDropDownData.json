@@ -1,0 +1,290 @@
+{
+  "Models": [
+    {
+    
+      "MakeId": "Toyota",
+      "Model": "Corolla"
+    },
+    {
+     
+      "MakeId": "Toyota",
+      "Model": "Hilux"
+    },
+    {
+     
+      "MakeId": "Toyota",
+      "Model": "Fortuner"
+    },
+    {
+    
+      "MakeId": "Toyota",
+      "Model": "Yaris"
+    },
+    {
+    
+      "MakeId": "Toyota",
+      "Model": "Prius"
+    },
+    {
+     
+      "MakeId": "Toyota",
+      "Model": "Land Cruiser"
+    },
+    {
+     
+      "MakeId": "Honda",
+      "Model": "Civic"
+    },
+    {
+     
+      "MakeId": "Honda",
+      "Model": "City"
+    },
+    {
+     
+      "MakeId": "Honda",
+      "Model": "BR-V"
+    },
+    {
+     
+      "MakeId": "Honda",
+      "Model": "Accord"
+    },
+    {
+     
+      "MakeId": "Suzuki",
+      "Model": "Mehran"
+    },
+    {
+     
+      "MakeId": "Suzuki",
+      "Model": "Cultus"
+    },
+    {
+
+      "MakeId": "Suzuki",
+      "Model": "Alto"
+    },
+    {
+     
+      "MakeId": "Suzuki",
+      "Model": "Wagon R"
+    },
+    {
+     
+      "MakeId": "Suzuki",
+      "Model": "Swift"
+    },
+    {
+      
+      "MakeId": "Hyundai",
+      "Model": "Elantra"
+    },
+    {
+     
+      "MakeId": "Hyundai",
+      "Model": "Tucson"
+    },
+    {
+      
+      "MakeId": "Hyundai",
+      "Model": "Sonata"
+    },
+    {
+     
+      "MakeId": "Kia",
+      "Model": "Sportage"
+    },
+    {
+     
+      "MakeId": "Kia",
+      "Model": "Picanto"
+    },
+    {
+      
+      "MakeId": "Kia",
+      "Model": "Sorento"
+    },
+    {
+      
+      "MakeId": "Changan",
+      "Model": "Alsvin"
+    },
+    {
+     
+      "MakeId": "Changan",
+      "Model": "Karvaan"
+    },
+    {
+      
+      "MakeId": "MG",
+      "Model": "HS"
+    },
+    {
+      
+      "MakeId": "MG",
+      "Model": "ZS"
+    },
+    {
+      
+      "MakeId": "MG",
+      "Model": "5"
+    },
+    {
+     
+      "MakeId": "FAW",
+      "Model": "V2"
+    }
+  ],
+  "Colors": [
+    {
+     
+      "ModelId": "Corolla",
+      "Color": "Super White II"
+    },
+    {
+      
+      "ModelId": "Corolla",
+      "Color": "Attitude Black"
+    },
+    {
+     
+      "ModelId": "Corolla",
+      "Color": "Silver Metallic"
+    },
+    {
+      
+      "ModelId": "Hilux",
+      "Color": "White"
+    },
+    {
+     
+      "ModelId": "Fortuner",
+      "Color": "Graphite"
+    },
+    {
+     
+      "ModelId": "Yaris",
+      "Color": "Blue"
+    },
+    {
+     
+      "ModelId": "Prius",
+      "Color": "White Pearl"
+    },
+    {
+     
+      "ModelId": "Land Cruiser",
+      "Color": "Dark Blue"
+    },
+    {
+      "ModelId": "Civic",
+      "Color": "White Pearl"
+    },
+    {
+     
+      "ModelId": "City",
+      "Color": "Red"
+    },
+    {
+     
+      "ModelId": "BR-V",
+      "Color": "Rallye Red"
+    },
+    {
+      
+      "ModelId": "Accord",
+      "Color": "Lunar Silver"
+    },
+    {
+      
+      "ModelId": "Mehran",
+      "Color": "Crystal Black"
+    },
+    {
+      
+      "ModelId": "Cultus",
+      "Color": "Golden Brown"
+    },
+    {
+     
+      "ModelId": "Alto",
+      "Color": "Modern Steel"
+    },
+    {
+    
+      "ModelId": "Wagon R",
+      "Color": "White"
+    },
+    {
+      
+      "ModelId": "Swift",
+      "Color": "Silver"
+    },
+    {
+
+      "ModelId": "Swift",
+      "Color": "White"
+    },
+    {
+     
+      "ModelId": "Elantra",
+      "Color": "Silver"
+    },
+    {
+    
+      "ModelId": "Tucson",
+      "Color": "Red"
+    },
+    {
+     
+      "ModelId": "Sonata",
+      "Color": "Phantom Black"
+    },
+    {
+      
+      "ModelId": "Sportage",
+      "Color": "Fluid Metal"
+    },
+    {
+      
+      "ModelId": "Picanto",
+      "Color": "Gravity Blue"
+    },
+    {
+     
+      "ModelId": "Sorento",
+      "Color": "Snow White Pearl"
+    },
+    {
+      
+      "ModelId": "Alsvin",
+      "Color": "Noble Blue"
+    },
+    {
+     
+      "ModelId": "Karvaan",
+      "Color": "Pearl White"
+    },
+    {
+    
+      "ModelId": "HS",
+      "Color": "Battersea Blue"
+    },
+    {
+      
+      "ModelId": "5",
+      "Color": "Dynamic Red"
+    },
+    {
+      
+      "ModelId": "ZS",
+      "Color": "Arctic White"
+    },
+    {
+      
+      "ModelId": "V2",
+      "Color": "Black Pearl"
+    }
+  ]
+}

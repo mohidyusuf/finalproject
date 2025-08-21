@@ -1,0 +1,88 @@
+﻿@page "/showbusses"
+@rendermode InteractiveServer
+@inject IBusService BusService
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<h3>Buses</h3>
+
+<a href="addbusses" class="btn btn-primary btn-sm mb-2">
+    + Add New Bus
+</a>
+
+@if (allBuses == null)
+{
+    <p>Loading buses...</p>
+}
+else
+{
+    <div style="margin-bottom: 30px;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Make</th>
+                    <th>Model</th>
+                    <th>Color</th>
+                    <th>Year</th>
+                    <th>Reg No.</th>
+                    <th>Image </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bus in allBuses)
+                {
+                    <tr>
+                        <td>@bus.Make</td>
+                        <td>@bus.Model</td>
+                        <td>@bus.Color</td>
+                        <td>@bus.Year</td>
+                        <td>@bus.RegistrationNumber</td>
+                        <td style="padding: 8px;"><img src=" @bus.Image" width="50" /></td>
+                        <td>
+                            <button @onclick="() => EditBus(bus.Id)" class="btn btn-sm btn-primary">Edit</button>
+                            <button @onclick="(() => DeleteBus(bus.Id))" class="btn btn-sm btn-danger">Delete</button>
+                            <button @onclick="() => MakePackage(bus.Id)" class="btn btn-sm btn-success">Make Package</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a href="showbussespackages" class="btn btn-secondary">See Bus Packages</a>
+  
+}
+
+@code {
+    private List<EntBus> allBuses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckUserAuthenticated() && await CheckService.CheckBusinessExists())
+        {
+            string BusinessId = await CheckService.GetBusinessId();
+            if (!string.IsNullOrEmpty(BusinessId))
+                allBuses = await BusService.GetAllByIdAsync(BusinessId);
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+
+    private void EditBus(string id) => NavManager.NavigateTo($"/addbusses/{id}");
+
+    private async Task DeleteBus(string id)
+    {
+        await BusService.DeleteAsync(id);
+        string BusinessId = await CheckService.GetBusinessId();
+        if (!string.IsNullOrEmpty(BusinessId))
+            allBuses = await BusService.GetAllByIdAsync(BusinessId);
+    }
+
+    private void MakePackage(string BusId)
+    {
+        NavManager.NavigateTo($"/addbussesspackages/{BusId}");
+    }
+}

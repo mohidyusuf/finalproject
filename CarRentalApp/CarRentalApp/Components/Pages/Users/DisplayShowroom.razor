@@ -1,0 +1,86 @@
+﻿@page "/searchshowrooms"
+@layout UserLayout
+@rendermode InteractiveServer
+
+@using Entities
+@inject IAboutShowroomService AboutShowroomService
+
+
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <span class="text-black-50">Search Showrooms by City</span>
+            <div class="d-flex mb-2">
+
+                <select class="form-select" @bind="searchCity">
+                    <option value="" selected disabled>---Select your city---</option>
+                    <option value="Multan">Multan</option>
+                    <option value="Lahore">Lahore</option>
+                    <option value="Islamabad">Islamabad</option>
+                </select>
+
+                <button class="btn btn-primary" @onclick="SearchShowrooms">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (loading)
+{
+    <p>Loading...</p>
+}
+else if (showroomResults == null || !showroomResults.Any())
+{
+    <div class="container">
+        <div class="alert alert-warning" role="alert">
+            No showrooms found for this city.
+        </div>
+    </div>
+
+}
+else
+{
+
+    <div class="container">
+
+        <div class="row">
+
+            @foreach (var s in showroomResults)
+            {
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="@s.Cover" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <p>@s.City</p>
+                            <h5 class="card-title">@s.ShowroomName</h5>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private string searchCity = "";
+    private bool loading = false;
+    private List<EntAboutShowroom>? showroomResults;
+
+    private async Task SearchShowrooms()
+    {
+        if (string.IsNullOrWhiteSpace(searchCity))
+        {
+            showroomResults = new List<EntAboutShowroom>();
+            return;
+        }
+
+        loading = true;
+        showroomResults = await AboutShowroomService.GetShowroomsByCity(searchCity.Trim());
+        loading = false;
+    }
+}

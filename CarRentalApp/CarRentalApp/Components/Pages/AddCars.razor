@@ -1,0 +1,315 @@
+﻿@page "/addcars/{CarId?}"
+@rendermode InteractiveServer
+@inject ICarService ServiceCar
+@inject IImageUploadService ImageUploadServices
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<EditForm Model="CarModel" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+
+    <!-- Make Dropdown (Hardcoded) -->
+    <div class="mb-3">
+        <label class="form-label">Make</label>
+        <select class="form-control" @bind="selectedMake">
+            <option value="">--- Select Make ---</option>
+            <option value="Toyota">Toyota</option>
+            <option value="Honda">Honda</option>
+            <option value="Suzuki">Suzuki</option>
+            <option value="Hyundai">Hyundai</option>
+            <option value="Kia">Kia</option>
+            <option value="Changan">Changan</option>
+            <option value="MG">MG</option>
+            <option value="FAW">FAW</option>
+        </select>
+        <ValidationMessage For="@(() => CarModel.Make)" />
+    </div>
+
+    <!-- Model Dropdown -->
+    <div class="mb-3">
+        <label class="form-label">Model</label>
+        <select class="form-control" @bind="selectedModel">
+            <option value="">--- Select Model ---</option>
+            @foreach (var model in filteredModels)
+            {
+                <option value="@model.Model">@model.Model</option>
+            }
+        </select>
+        <ValidationMessage For="@(() => CarModel.Model)" />
+    </div>
+
+    <!-- Color Dropdown -->
+    <div class="mb-3">
+        <label class="form-label">Color</label>
+        <select class="form-control" @bind="selectedColor">
+            <option value="">--- Select Color ---</option>
+            @foreach (var color in filteredColors)
+            {
+                <option value="@color.Color">@color.Color</option>
+            }
+        </select>
+        <ValidationMessage For="@(() => CarModel.Color)" />
+    </div>
+
+    <!-- Year -->
+    <div >
+        <label for="year" class="form-label">Year</label>
+        <InputNumber id="year" class="form-control" @bind-Value="CarModel.Year" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+        <ValidationMessage For="@(() => CarModel.Year)" />
+        @if (!string.IsNullOrEmpty(YearError))
+        {
+            <div class="text-danger mt-1">@YearError</div>
+        }
+    </div>
+
+
+    <!-- Registration Number -->
+    <div class="mb-3">
+        <label for="registration" class="form-label">Registration Number</label>
+        <InputText id="registration" class="form-control" @bind-Value="CarModel.RegistrationNumber" placeholder=" ABC-123" />
+        <ValidationMessage For="@(() => CarModel.RegistrationNumber)" />
+    </div>
+
+    <!-- Fuel Type -->
+    <div class="mb-3">
+        <label for="fueltype" class="form-label">Fuel Type</label>
+        <select id="fueltype" class="form-control" @bind="CarModel.FuelType">
+            <option value="">Select Fuel Type</option>
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Electric">Electric</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="CNG">CNG</option>
+            <option value="LPG">LPG</option>
+        </select>
+    </div>
+
+    <!-- Transmission -->
+    <div class="mb-3">
+        <label for="transmission" class="form-label">Transmission</label>
+        <select id="transmission" class="form-control" @bind="CarModel.Transmission">
+            <option value="">Select Transmission Type</option>
+            <option value="Automatic">Automatic</option>
+            <option value="Manual">Manual</option>
+        </select>
+    </div>
+
+    <!-- Seating Capacity -->
+    <div class="mb-3">
+        <label for="seating" class="form-label">Seating Capacity</label>
+        <InputText id="seating" class="form-control" @bind-Value="CarModel.SeatingCapacity" placeholder="eg.1,2,3" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+    </div>
+
+    <!-- Engine Capacity -->
+    <div class="mb-3">
+        <label for="seating" class="form-label">Engine Capacity</label>
+        <InputNumber id="engine" class="form-control" @bind-Value="CarModel.EngineCapacity" placeholder="eg.1,2,3" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+    </div>
+    <!-- Doors -->
+    <div class="mb-3">
+        <label for="doors" class="form-label">Doors </label>
+        <InputNumber id="doors" class="form-control" @bind-Value="CarModel.Doors" placeholder="eg.1,2,3" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+    </div>
+  
+    <!-- Boot space -->
+    <div class="mb-3">
+        <label for="bootspace" class="form-label">Boot Space</label>
+        <InputNumber id="bootspace" class="form-control" @bind-Value="CarModel.BootSpaceLiters" placeholder="eg.1,2,3" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+    </div>
+    <!-- Description -->
+    <div class="mb-3">
+        <label for="description" class="form-label"> Car Description </label>
+        <InputText id="description" class="form-control" @bind-Value="CarModel.CarDescription" placeholder="optional" />
+    </div>
+  
+
+    <!-- Image -->
+    <div class="mb-3">
+        <label class="form-label">Car Image</label>
+        <InputFile OnChange="HandleImageUpload" accept=".jpg,.jpeg,.png,.gif,.jfif" />
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="text-danger">@errorMessage</div>
+    }  @if (!string.IsNullOrEmpty(CarModel.Image))
+        {
+            <img src="@CarModel.Image" width="100" class="mt-2" />
+        }
+    </div>
+
+    <!-- Status -->
+    <div class="mb-3 form-check">
+        <InputCheckbox id="IsAvailaible" class="form-check-input" @bind-Value="CarModel.Status" />
+        <label for="Is Availaible" class="form-check-label">Is Availaible</label>
+    </div>
+
+    <!-- AC -->
+    <div class="mb-3 form-check">
+        <InputCheckbox id="hasac" class="form-check-input" @bind-Value="CarModel.HasAC" />
+        <label for="hasac" class="form-check-label">Has AC</label>
+    </div>
+
+    <!-- Has Gps -->
+    <div class="mb-3 form-check">
+        <InputCheckbox id="hasgps" class="form-check-input" @bind-Value="CarModel.HasGPS" />
+        <label for="hasgps" class="form-check-label">Has Gps</label>
+    </div>
+
+    <!-- Car Type -->
+    <div class="mb-3">
+        <label for="cartype" class="form-label">Car Type</label>
+        <select id="cartype" class="form-control" @bind="CarModel.CarType">
+            <option value="">Select Car Type</option>
+            <option value="Sedan">Sedan</option>
+            <option value="HatchBack">HatchBack</option>
+            <option value="CrossOver">CrossOver</option>
+            <option value="Suv">Suv</option>
+        </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary me-2">@ButtonName</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">@CButtonName</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? CarId { get; set; }
+
+    private string ButtonName = "";
+    private string CButtonName = "";
+    private EntCar CarModel = new EntCar();
+    private EntCarDropDown dropdownData = new EntCarDropDown();
+
+    // Filtered lists
+    private List<EntCarModels> filteredModels = new List<EntCarModels>();
+    private List<EntCarColors> filteredColors = new List<EntCarColors>();
+
+    // Backing fields for two-way binding
+    private string _selectedMake = "";
+    private string _selectedModel = "";
+    private string _selectedColor = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckBusinessExists() && await CheckService.CheckUserAuthenticated())
+        {
+            // Load dropdown data from JSON
+            dropdownData = DalCarDropDown.GetAllDropdownData();
+
+            if (CarId != null)
+            {
+                // Edit mode
+                CarModel = await ServiceCar.GetByIdAsync(CarId);
+                ButtonName = "Update";
+                CButtonName = "Cancel Update";
+            }
+            else
+            {
+                ButtonName = "Save Car";
+                CButtonName = "Cancel";
+            }
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+
+    public string selectedMake
+    {
+        get => _selectedMake;
+        set
+        {
+            _selectedMake = value;
+            CarModel.Make = value;
+
+
+            filteredModels = dropdownData.Models .Where(m => m.MakeId == value) .ToList();
+
+            // Reset dependent dropdowns
+            selectedModel = "";
+            selectedColor = "";
+            StateHasChanged();
+        }
+    }
+
+    public string selectedModel
+    {
+        get => _selectedModel;
+        set
+        {
+            _selectedModel = value;
+            CarModel.Model = value;
+
+            filteredColors = dropdownData.Colors .Where(c => c.ModelId == value) .ToList();
+
+            // Reset color selection
+            selectedColor = "";
+            StateHasChanged();
+        }
+    }
+
+    public string selectedColor
+    {
+        get => _selectedColor;
+        set
+        {
+            _selectedColor = value;
+            CarModel.Color = value;
+        }
+    }
+
+    public string YearError { get; set; } = string.Empty;
+
+    private async Task HandleSubmit()
+    {
+        // Reset error message
+        YearError = string.Empty;
+
+        // Validate year
+        if (CarModel.Year > DateTime.Now.Year)
+        {
+            YearError = $"Year cannot be after {DateTime.Now.Year}";
+            return; 
+        }
+        if (ButtonName == "Update")
+        {
+            await ServiceCar.UpdateAsync(CarId!, CarModel);
+        }
+        else
+        {
+            CarModel.BusinessId = await CheckService.GetBusinessId();
+            await ServiceCar.CreateAsync(CarModel);
+        }
+
+        NavManager.NavigateTo("/showcars");
+    
+
+       
+    }
+
+    private string errorMessage = "";
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        errorMessage = "";
+        try
+        {
+            CarModel.Image = await ImageUploadServices.UploadImageAsync(e.File, "cars");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+
+    private void CancelEdit()
+    {
+        NavManager.NavigateTo("/showcars");
+    }
+}

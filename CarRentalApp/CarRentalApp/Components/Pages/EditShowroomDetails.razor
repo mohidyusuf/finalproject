@@ -1,0 +1,146 @@
+﻿@page "/editshowroomdetails"
+@rendermode InteractiveServer
+
+@using CarRentalApp.Services
+@using System.Security.Claims
+@using Entities
+@inject IAboutShowroomService AboutShowroomService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+
+<h3 class="text-2xl font-bold mb-4">My Showroom</h3>
+
+@if (loading)
+{
+    <p>Loading showroom...</p>
+}
+else if (showroom == null)
+{
+    <p class="text-danger">You don’t have a showroom yet. <a href="/createshowroom">Create one here</a>.</p>
+}
+else
+{
+    <EditForm Model="showroom" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <!-- Basic Info -->
+        <div class="mb-3">
+            <label>Showroom Name</label>
+            <input type="text" class="form-control" @bind="showroom.ShowroomName" />
+        </div>
+
+        <div class="mb-3">
+            <label>Owner Name</label>
+            <input type="text" class="form-control" @bind="showroom.OwnerName" />
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea class="form-control" @bind="showroom.Description"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Opening Hours</label>
+            <input type="time" class="form-control" @bind="showroom.OpeningTime" />
+        </div>
+        <div class="mb-3">
+            <label>Opening Hours</label>
+            <input type="time" class="form-control" @bind="showroom.ClosingTime" />
+        </div>
+        <div class="mb-3 form-check">
+            <InputCheckbox id="Status" class="form-check-input" @bind-Value="showroom.Status" />
+            <label for="Status" class="form-check-label">Status</label>
+        </div>
+
+        <!-- Addresses -->
+        <h5>Addresses</h5>
+
+        <div class="border p-3 mb-2">
+            <input type="text" class="form-control mb-2" placeholder="Country" @bind="showroom.Country" />
+            <input type="text" class="form-control mb-2" placeholder="Country" @bind="showroom.City" />
+            <input type="text" class="form-control mb-2" placeholder="Country" @bind="showroom.Address" />
+            <input type="text" class="form-control mb-2" placeholder="Country" @bind="showroom.GoogleMapsLink" />
+
+        </div>
+
+
+
+        <!-- Contact Info -->
+        <h5>Contact Information</h5>
+
+        <div class="border p-3 mb-2">
+            <input type="text" class="form-control mb-2" placeholder="Phone" @bind="showroom.ContactPhone" />
+            <input type="text" class="form-control mb-2" placeholder="Email" @bind="showroom.ContactEmail" />
+
+        </div>
+
+        <!-- Social Media -->
+        <h5>Social Media References</h5>
+
+        <div class="border p-3 mb-2">
+            <input type="text" class="form-control mb-2" placeholder="Facebook Link" @bind="showroom.FacebookUrl" />
+            <input type="text" class="form-control mb-2" placeholder="Instagram Link " @bind="showroom.InstagramUrl" />
+
+        </div>
+       
+        <br />
+
+        <!-- Save/Update Button -->
+        <button  type="submit" class="btn btn-primary mt-3">Update Showroom</button>
+
+        @if (isSaved)
+        {
+            <p class="text-success mt-3">Showroom updated successfully!</p>
+            NavigationManager.NavigateTo("/myshowroom");
+        }
+        <div class="mt-3">
+            <button type="button" class="btn btn-secondary" @onclick="CancelEdit">
+                Cancel
+            </button>
+        </div>
+
+    </EditForm>
+}
+@code {
+    private EntAboutShowroom? showroom;
+    private bool isSaved = false;
+    private bool loading = true;
+    private string? UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = client.User;
+
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+
+        UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+
+        showroom = await AboutShowroomService.GetShowroomByUserId(UserId);
+        loading = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (showroom == null) return;
+
+        await AboutShowroomService.UpdateShowroom(showroom);
+
+        isSaved = true;
+    }
+    private void CancelEdit()
+    {
+        NavigationManager.NavigateTo("/myshowroom");
+    }
+    
+  
+
+    
+}

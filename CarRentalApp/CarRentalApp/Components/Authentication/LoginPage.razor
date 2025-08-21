@@ -1,0 +1,54 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Google
+<h3>LoginPage</h3>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@code {
+    [CascadingParameter]
+    public HttpContext? httpContext { get; set; }
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (httpContext == null)
+            {
+                throw new InvalidOperationException("HttpContext is not available");
+            }
+
+            var authProperties = new AuthenticationProperties
+            {
+                RedirectUri = "/after-login",
+                Parameters =
+                {
+                    { "prompt", "select_account" }
+                }
+            };
+
+            var result = TypedResults.Challenge(authProperties,
+                [GoogleDefaults.AuthenticationScheme]
+            );
+
+            await result.ExecuteAsync(httpContext);
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = "Authentication setup error: " + ex.Message;
+        }
+        catch (AuthenticationFailureException ex)
+        {
+            errorMessage = "Authentication failed: " + ex.Message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An unexpected error occurred: " + ex.Message;
+        }
+    }
+}

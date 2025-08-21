@@ -1,0 +1,134 @@
+{
+  "Models": [
+    {
+      "MakeId": "Toyota",
+      "Model": "Hiace Commuter"
+    },
+    {
+      "MakeId": "Toyota",
+      "Model": "Hiace Van"
+    },
+    {
+      "MakeId": "Toyota",
+      "Model": "Hiace GL"
+    },
+    {
+      "MakeId": "Toyota",
+      "Model": "Hiace Super GL"
+    },
+    {
+      "MakeId": "Toyota",
+      "Model": "Hiace DX"
+    },
+    {
+      "MakeId": "Toyota",
+      "Model": "Hiace Ambulance"
+    },
+    {
+      "MakeId": "Nissan",
+      "Model": "Urvan"
+    },
+    {
+      "MakeId": "Nissan",
+      "Model": "Caravan"
+    },
+    {
+      "MakeId": "Mitsubishi",
+      "Model": "L300"
+    },
+    {
+      "MakeId": "Mitsubishi",
+      "Model": "Delica"
+    },
+    {
+      "MakeId": "Hyundai",
+      "Model": "H-1 (Starex)"
+    },
+    {
+      "MakeId": "Hyundai",
+      "Model": "County"
+    },
+    {
+      "MakeId": "Kia",
+      "Model": "Pregio"
+    },
+    {
+      "MakeId": "Kia",
+      "Model": "Bongo"
+    },
+    {
+      "MakeId": "Hino",
+      "Model": "Dutro"
+    },
+    {
+      "MakeId": "Isuzu",
+      "Model": "NLR"
+    }
+  ],
+  "Colors": [
+    {
+      "ModelId": "Hiace Commuter",
+      "Color": "Super White"
+    },
+    {
+      "ModelId": "Hiace Van",
+      "Color": "Silver Metallic"
+    },
+    {
+      "ModelId": "Hiace GL",
+      "Color": "Commercial White"
+    },
+    {
+      "ModelId": "Hiace Super GL",
+      "Color": "White Pearl"
+    },
+    {
+      "ModelId": "Hiace DX",
+      "Color": "Attitude Black"
+    },
+    {
+      "ModelId": "Hiace Ambulance",
+      "Color": "Dark Blue"
+    },
+    {
+      "ModelId": "Caravan",
+      "Color": "Plain White"
+    },
+    {
+      "ModelId": "Urvan",
+      "Color": " Urvan Blue"
+    },
+    {
+      "ModelId": "L300",
+      "Color": "Brown"
+    },
+    {
+      "ModelId": "Delica",
+      "Color": "Red"
+    },
+    {
+      "ModelId": "H-1 (Starex)",
+      "Color": " White"
+    },
+    {
+      "ModelId": "County",
+      "Color": " Black"
+    },
+    {
+      "ModelId": "Pregio",
+      "Color": " Silver"
+    },
+    {
+      "ModelId": "Bongo",
+      "Color": " White"
+    },
+    {
+      "ModelId": "Nlr",
+      "Color": " White"
+    },
+    {
+      "ModelId": "Dutro",
+      "Color": " Blue"
+    }
+  ]
+}

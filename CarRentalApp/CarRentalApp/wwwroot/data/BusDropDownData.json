@@ -1,0 +1,147 @@
+{
+  "Models": [
+    {
+      "MakeId": "Hino",
+      "Model": "Hino 300 Series"
+    },
+    {
+      "MakeId": "Hino",
+      "Model": "Hino 500 Series"
+    },
+    {
+      "MakeId": "Hino",
+      "Model": "Hino RG Bus"
+    },
+    {
+      "MakeId": "Daewoo",
+      "Model": "BH120"
+    },
+    {
+      "MakeId": "Daewoo",
+      "Model": "FX116"
+    },
+    {
+      "MakeId": "Daewoo",
+      "Model": "BX212"
+    },
+    {
+      "MakeId": "Mercedes",
+      "Model": "O500"
+    },
+    {
+      "MakeId": "Mercedes",
+      "Model": "OC500"
+    },
+    {
+      "MakeId": "Mercedes",
+      "Model": "Tourismo"
+    },
+    {
+      "MakeId": "Toyota",
+      "Model": "Coaster"
+    },
+  
+    {
+      "MakeId": "Volvo",
+      "Model": "B7R"
+    },
+    {
+      "MakeId": "Volvo",
+      "Model": "B9R"
+    },
+    {
+      "MakeId": "Scania",
+      "Model": "K-Series"
+    },
+    {
+      "MakeId": "MAN",
+      "Model": "Lions Coach"
+    },
+    {
+      "MakeId": "Yutong",
+      "Model": "ZK6122H9"
+    }
+  ],
+  "Colors": [
+    {
+      "Id": 1,
+      "ModelId": "Hino 300 Series",
+      "Color": "White"
+    },
+    {
+      "Id": 2,
+      "ModelId": "Hino 500 Series",
+      "Color": "Blue-White"
+    },
+    {
+      "Id": 3,
+      "ModelId": "Hino RG Bus",
+      "Color": "Red-White"
+    },
+    {
+      "Id": 4,
+      "ModelId": "BH120",
+      "Color": "Silver"
+    },
+    {
+      "Id": 5,
+      "ModelId": "FX116",
+      "Color": "Red"
+    },
+    {
+      "Id": 6,
+      "ModelId": "BX212",
+      "Color": "Green"
+    },
+    {
+      "Id": 7,
+      "ModelId": "O500",
+      "Color": "Blue"
+    },
+    {
+      "Id": 8,
+      "ModelId": "OC500",
+      "Color": "Yellow"
+    },
+    {
+      "Id": 9,
+      "ModelId": "Tourismo",
+      "Color": "Silver"
+    },
+    {
+      "Id": 10,
+      "ModelId": "Hiace Commuter",
+      "Color": "Black"
+    },
+    {
+      "Id": 11,
+      "ModelId": "Coaster",
+      "Color": "White-Blue"
+    },
+    {
+      "Id": 12,
+      "ModelId": "B7R",
+      "Color": "White-Grey"
+    },
+    {
+      "Id": 13,
+      "ModelId": "K-Series",
+      "Color": "White"
+    },
+    {
+      "Id": 14,
+      "ModelId": "B9R",
+      "Color": "Beige"
+    },
+    {
+      "Id": 15,
+      "ModelId": "Lions Coach",
+      "Color": "White"
+    },
+    {
+      "Id": 16,
+      "ModelId": "ZK6122H9",
+      "Color": "Silver"
+    }
+  ]
+}

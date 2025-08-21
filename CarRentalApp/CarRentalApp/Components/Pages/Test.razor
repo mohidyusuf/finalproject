@@ -1,0 +1,84 @@
+﻿@page "/test"
+@rendermode InteractiveServer
+
+
+<div class="mb-3">
+    <label>Select Car Make:</label>
+
+    <select class="form-control" @onchange="OnMakeChanged">
+        <option value="">-- Select Make --</option>
+        @foreach (var car in CarsList)
+        {
+            <option value="@car.CarId">@car.Make</option>
+        }
+    </select>
+
+    <label>Select Car Make:</label>
+
+    <select class="form-control" @onchange="OnModelChanged">
+        <option value="">-- Select Make --</option>
+        @if (SelectedModelList != null)
+        {
+            @foreach (var car in SelectedModelList)
+            {
+                <option value="@car.MakeModelId">@car.CarName</option>
+            }
+        }
+    </select>
+</div>
+
+<h1>Selectd value =@selectedCarId</h1>
+
+@code {
+
+    public class Cars
+    {
+        public int CarId { get; set; }
+        public string? Make { get; set; }
+
+    }
+    public class MakeModel
+    {
+        public int MakeModelId { get; set; }
+        public int RefCarId { get; set; }
+        public string? CarName { get; set; }
+    }
+
+    List<Cars> CarsList = new List<Cars>();
+    List<MakeModel> MakeModelList = new List<MakeModel>()
+    {
+        new(){MakeModelId=10,RefCarId=1, CarName="Car 1"},
+        new(){MakeModelId=20,RefCarId=1, CarName="Car 2"},
+        new(){MakeModelId=30,RefCarId=1, CarName="Car 3"},
+        new(){MakeModelId=40,RefCarId=2, CarName="CarCar 1"},
+        new(){MakeModelId=50,RefCarId=2, CarName="CarCar 2"},
+        new(){MakeModelId=60,RefCarId=2, CarName="CarCar 3"},
+
+    };
+
+    protected override void OnInitialized()
+    {
+        CarsList = new List<Cars>()
+    {
+        new(){CarId=1,Make="Car 1"},
+        new(){CarId=2,Make="Car 2"},
+        new(){CarId=3,Make="Car 3"},
+        new(){CarId=4,Make="Car 4"},
+    };
+
+    }
+
+    int selectedCarId;
+
+    List<MakeModel> SelectedModelList = new List<MakeModel>();
+    private void OnMakeChanged(ChangeEventArgs e)
+    {
+        selectedCarId = Convert.ToInt32(e.Value);
+        SelectedModelList = MakeModelList.Where(x => x.RefCarId == selectedCarId).ToList();
+    }
+
+    private void OnModelChanged(ChangeEventArgs e)
+    {
+
+    }
+}

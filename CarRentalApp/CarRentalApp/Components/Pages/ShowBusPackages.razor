@@ -1,0 +1,84 @@
+﻿@page "/showbussespackages"
+@rendermode InteractiveServer
+@inject IBusPackageService ServiceBusPackage
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+<h3>Packages</h3>
+
+<a href="showbusses" class="btn btn-primary btn-sm mb-2">
+    + Add New Package
+</a>
+
+@if (allBusPackages == null)
+{
+    <p>Loading Packages...</p>
+}
+else
+{
+    <div style="margin-bottom: 30px;">
+        <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+
+                    <th style="padding: 8px; border: 1px solid #ddd;">Make</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Model</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Duration</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">With Driver</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Image</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Actions</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bus in allBusPackages)
+                {
+                    <tr style="border: 1px solid #ddd;">
+
+
+                        <td style="padding: 8px;">@bus.BusMake</td>
+                        <td style="padding: 8px;">@bus.BusModel</td>
+                        <td style="padding: 8px;">RS.@bus.Price</td>
+                        <td style="padding: 8px;">@bus.Duration</td>
+                        <td style="padding: 8px;">@(bus.WithDriver ? "Yes" : "No")</td>
+                        <td style="padding: 8px;"><img src=" @bus.BusImage" width="50" /></td>
+
+                        <td> <button @onclick="(() => DeleteBusPackage(bus.Id))" class="btn btn-sm btn-danger">Delete</button></td>
+
+                        <td style="padding: 8px;"> </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a href="showbusses" class="btn btn-secondary">Cancel</a>
+}
+
+@code {
+    private List<EntBusPackage> allBusPackages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckBusinessExists() && await CheckService.CheckUserAuthenticated())
+        {
+
+            var businessId = await CheckService.GetBusinessIdAsync();
+            allBusPackages = await ServiceBusPackage.GetAllByBusinessIdAsync(businessId);
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+
+    }
+
+    private async Task DeleteBusPackage(string id)
+    {
+        await ServiceBusPackage.DeleteAsync(id);
+        var businessId = await CheckService.GetBusinessIdAsync();
+        allBusPackages = await ServiceBusPackage.GetAllByBusinessIdAsync(businessId);
+    }
+
+
+}

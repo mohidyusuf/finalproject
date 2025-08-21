@@ -1,0 +1,39 @@
+﻿@page "/showroom/{BusinessId?}"
+@inject BusinessCheckService CheckService
+@inject NavigationManager NavManager
+@inject IAboutShowroomService ShowRoomService
+@inject BusinessCheckService CheckService
+<h3>ShowShowroom</h3>
+
+
+@if (ShowRoom != null)
+{
+    <div>
+        <h4>Showroom Details</h4>
+        <p><strong>Name:</strong> @ShowRoom.OwnerName</p>
+        <p><strong>Description:</strong> @ShowRoom.Description</p>
+        <!-- Add more fields as necessary -->
+    </div>
+}
+else
+{
+    <p>Loading showroom details...</p>
+}
+
+
+@code {
+    [Parameter] public string? BusinessId { get; set; }
+    private EntAboutShowroom ShowRoom = new();
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckBusinessExists() && await CheckService.CheckUserAuthenticated())
+        {
+            var UserId = await CheckService.GetCurrentUserIdAsync();
+            ShowRoom = await ShowRoomService.GetShowroomById(UserId!) ?? new EntAboutShowroom();
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+}

@@ -1,0 +1,84 @@
+﻿@page "/showhiacepackages"
+@rendermode InteractiveServer
+@inject IHiacePackageService ServiceHiacePackage
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<h3>Packages</h3>
+
+<a href="showhiaces" class="btn btn-primary btn-sm mb-2">
+    + Add New Package
+</a>
+
+@if (allHiacesPackages == null)
+{
+    <p>Loading Packages...</p>
+}
+else
+{
+    <div style="margin-bottom: 30px;">
+        <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+
+                    <th style="padding: 8px; border: 1px solid #ddd;">Make</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Model</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Price</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Duration</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">With Driver</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;"> Image</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Actions</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hiace in allHiacesPackages)
+                {
+                    <tr style="border: 1px solid #ddd;">
+
+
+                        <td style="padding: 8px;">@hiace.HiaceMake</td>
+                        <td style="padding: 8px;">@hiace.HiaceModel</td>
+                        <td style="padding: 8px;">RS.@hiace.Price</td>
+                        <td style="padding: 8px;">@hiace.Duration</td>
+                        <td style="padding: 8px;">@(hiace.WithDriver ? "Yes" : "No")</td>
+                        <td style="padding: 8px;"><img src=" @hiace.HiaceImage" width="50" /></td>
+                        <td> <button @onclick="(() => DeleteHiacePackage(hiace.Id))" class="btn btn-sm btn-danger">Delete</button></td>
+
+                        <td style="padding: 8px;"> </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a href="showhiaces" class="btn btn-secondary">Cancel</a>
+}
+
+@code {
+    private List<EntHiacePackage> allHiacesPackages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckBusinessExists() && await CheckService.CheckUserAuthenticated())
+        {
+
+            var businessId = await CheckService.GetBusinessIdAsync();
+            allHiacesPackages = await ServiceHiacePackage.GetAllByBusinessIdAsync(businessId);
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+
+    }
+
+    private async Task DeleteHiacePackage(string id)
+    {
+        await ServiceHiacePackage.DeleteAsync(id);
+        var businessId = await CheckService.GetBusinessIdAsync();
+        allHiacesPackages = await ServiceHiacePackage.GetAllByBusinessIdAsync(businessId);
+    }
+
+
+}

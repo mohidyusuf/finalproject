@@ -1,0 +1,71 @@
+﻿@inject BusinessCheckService BusinessService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<nav class="navbar navbar-expand-lg fixed-top bg-body-tertiar navbar-light bg-light shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bolder" href="#">
+            <img src="/logoblackred.png" height="30" />
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    @if (IsAuthenticated && IsBusinessExist)
+                    {
+                        <a class="nav-link" href="myshowroom">My Business</a>
+                    }
+                    else if (IsAuthenticated && !IsBusinessExist)
+                    {
+                        <a class="nav-link" href="createshowroom">Create Business</a>
+                    }
+                </li>
+              
+            </ul>
+            <div class="d-flex ms-auto  ">
+                <a class="nav-link text-black" href="/about#top">About Us</a>
+
+                @if (!IsAuthenticated)
+                {
+                    <a href="login" class="btn btn-dark">Login</a>
+                }
+                else
+                {
+                    <a href="logout" class="btn btn-danger">Logout</a>
+                }
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private bool IsBusinessExist = false;
+    private bool IsAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            IsAuthenticated = user.Identity?.IsAuthenticated ?? false;
+
+            if (IsAuthenticated)
+            {
+                IsBusinessExist = await BusinessService.CheckBusinessExists();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking authentication/business existence: {ex.Message}");
+            IsBusinessExist = false;
+            IsAuthenticated = false;
+        }
+    }
+}

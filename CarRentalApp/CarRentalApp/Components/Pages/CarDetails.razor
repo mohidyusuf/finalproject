@@ -1,0 +1,169 @@
+﻿@page "/cardetails/{id}"
+@inject ICarService CarService
+@inject IAboutShowroomService ShowroomService
+@inject NavigationManager NavManager
+@layout UserLayout
+
+
+
+<div style="height: 50px;"></div>
+ <div class="container">
+
+@if (showroom != null)
+{
+    <div class="bg-dark text-white">
+        <div class="row">
+            <div class="col-md-2 ps-5" style="margin-top:-60px">
+                <img src="@(!string.IsNullOrEmpty(showroom.Logo) ? showroom.Logo : "/images/defaultlogo.jpg")"
+                     class="rounded-circle border border-3 border-white shadow"
+                     style="width:120px;height:120px;object-fit:cover;" />
+            </div>
+
+            <div class="container">
+            <div class="col-md-10">
+                <div class="row pt-2">
+                    <div class="col-md-4">
+                        <h2 class="fw-bold">@showroom.ShowroomName</h2>
+
+                    </div>
+                    <div class="col-md-4 pt-1">
+                        <span class="small">📍 @showroom.Address,@showroom.City,@showroom.Country </span>
+                    </div>
+                    <div class="col-md-4 pt-1">
+                        <span class="small pe-2"> 📞@showroom.ContactPhone </span>
+                        @if (!string.IsNullOrEmpty(showroom.ContactEmail))
+                        {
+                            <div class="d-flex align-items-center small">
+                                <span class="me-1">✉️</span>
+                                <span>@showroom.ContactEmail</span>
+                            </div>
+                        }
+
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+
+        </div>
+    </div>
+
+    @if (car == null)
+    {
+        <p>Loading car details...</p>
+    }
+    else
+    {
+        <div class="card shadow-lg p-4" style="max-width: 800px; margin: auto;">
+            <div class="row g-4">
+                <!-- Car Image -->
+                <div class="col-md-5 text-center">
+                    <img src="@car.Image" alt="Car Image" class="img-fluid rounded" style="max-height: 250px; object-fit: cover;" />
+                </div>
+
+                <!-- Car Info -->
+                <div class="col-md-7">
+                    <h4>@car.Make @car.Model (@car.Year)</h4>
+                    <p class="text-muted">Registration: @car.RegistrationNumber</p>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">Color</dt>
+                        <dd class="col-sm-8">@car.Color</dd>
+
+                        <dt class="col-sm-4">Fuel Type</dt>
+                        <dd class="col-sm-8">@car.FuelType</dd>
+
+                        <dt class="col-sm-4">Transmission</dt>
+                        <dd class="col-sm-8">@car.Transmission</dd>
+
+                        <dt class="col-sm-4">Seating</dt>
+                        <dd class="col-sm-8">@car.SeatingCapacity</dd>
+
+                        <dt class="col-sm-4">Engine</dt>
+                        <dd class="col-sm-8">@car.EngineCapacity cc</dd>
+
+                        <dt class="col-sm-4">AC</dt>
+                        <dd class="col-sm-8">@(car.HasAC ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">GPS</dt>
+                        <dd class="col-sm-8">@(car.HasGPS ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">Doors</dt>
+                        <dd class="col-sm-8">@car.Doors</dd>
+
+                        <dt class="col-sm-4">Boot Space</dt>
+                        <dd class="col-sm-8">@car.BootSpaceLiters L</dd>
+
+                        <dt class="col-sm-4">Car Type</dt>
+                        <dd class="col-sm-8">@car.CarType</dd>
+
+                        @if (car.CarDescription != null){
+                        <dt class="col-sm-4">Car Descriptiom</dt>
+                        <dd class="col-sm-8">@car.CarDescription</dd>
+                        }
+
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">@(car.Status ? "Available" : "Not Available")</dd>
+
+                        <dt class="col-sm-4">Created At</dt>
+                        <dd class="col-sm-8">@car.CreatedAt.ToLocalTime().ToString("f")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <NavLink class="btn btn-secondary" href="/searchcarpackages">
+                ⬅ Back to search
+            </NavLink>
+                <NavLink class="btn btn-primary" href="@($"/showroomdetails/{showroom.Id}")">
+                    View Showroom
+                </NavLink>
+        </div>
+
+        
+     
+
+    }
+    <div style="height:60px;"></div>
+}
+
+<section class="container-fluid bg-dark fixed-bottom" style="height:60px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card bg-transparent text-secondary">
+                    <div class="card-body py-2">
+                        <div class="mb-2">
+                            <img src="/logowhitered.png" height="20" />
+                            <span class="small">&copy; 2025 GoRent. All rights reserved.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+    private EntCar? car;
+    private EntAboutShowroom showroom = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            car = await CarService.GetByIdAsync(Id);
+            showroom = await ShowroomService.GetByBusinessId(car.BusinessId) ?? new EntAboutShowroom();
+        }
+    }
+
+    private void GoBack()
+    {
+        NavManager.NavigateTo("/searchcarpackages");
+    }
+}

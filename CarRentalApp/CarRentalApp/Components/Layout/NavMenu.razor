@@ -1,0 +1,83 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">goRent</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+
+        <AuthorizeView>
+            <Authorized>
+                @* <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Registration Form
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="createshowroom">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Create Showroom
+                    </NavLink>
+                </div> *@
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="myshowroom">
+                        <span class="bi bi-shop-fill-nav-menu" aria-hidden="true"></span> My Showroom
+                    </NavLink>
+                </div>
+            
+
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="showcars">
+                        <span class="bi bi-car-fill-nav-menu" aria-hidden="true"></span>  Cars
+                    </NavLink>
+                </div> 
+
+                 @* <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="showcarspackages">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>  Car Packages
+                    </NavLink>
+                </div> *@
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="showbusses">
+                        <span class="bi bi-bus-nav-menu " aria-hidden="true"></span>  Busses
+                    </NavLink>
+                </div>
+                @* <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="showbussespackages">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>  Bus Packages
+                    </NavLink>
+                </div> *@
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="showhiaces">
+                        <span class="bi bi-shuttle-side-fill-nav-menu" aria-hidden="true"></span>  Hiaces
+                    </NavLink>
+                </div>
+
+                @* <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="showhiacepackages">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Hiace Packages
+                    </NavLink>
+                </div> *@
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="logout">
+                        <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="login">
+                        <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </nav>
+</div>
+

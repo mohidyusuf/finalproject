@@ -1,0 +1,159 @@
+﻿@page "/createshowroom"
+@rendermode InteractiveServer
+
+@using CarRentalApp.Services
+@using System.Security.Claims
+@using Entities
+@inject IAboutShowroomService AboutShowroomService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@layout UserLayout
+
+@attribute [Authorize]
+
+<h3 class="text-2xl font-bold mb-4">Create Showroom</h3>
+
+@if (loading)
+{
+    <p>Loading...</p>
+}
+else if (accessDenied)
+{
+    <div class="alert alert-danger">
+        <strong>Access Denied:</strong> You already have a showroom.
+        Please <a href="//myshowroom">edit your existing showroom</a>.
+    </div>
+}
+else
+{
+    <EditForm Model="showroom" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <!-- Basic Info -->
+        <div class="mb-3">
+            <label>Showroom Name</label>
+            <input type="text" class="form-control" @bind="showroom.ShowroomName" />
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3 form-check">
+            <InputCheckbox id="Is Active" class="form-check-input" @bind-Value="showroom.Status" />
+            <label for="Is Active" class="form-check-label">Is Active</label>
+        </div>
+
+        <div class="mb-3">
+            <label>Owner Name</label>
+            <input type="text" class="form-control" @bind="showroom.OwnerName" oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')" />
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea class="form-control" @bind="showroom.Description"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Opening Time</label>
+            <input type="time" class="form-control" @bind="showroom.OpeningTime" placeholder="Set Opening Time" />
+        </div>
+        <div class="mb-3">
+            <label>Closing Time</label>
+            <input type="time" class="form-control" @bind="showroom.ClosingTime" placeholder="Set Closing Time" />
+        </div>
+
+        <!-- Addresses -->
+        <h5>Addresses</h5>
+
+        <div class="border p-3 mb-2">
+            <input type="text" class="form-control mb-2" placeholder="Country" @bind="showroom.Country" />
+            <input type="text" class="form-control mb-2" placeholder="City" @bind="showroom.City" oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'')" />
+            <input type="text" class="form-control mb-2" placeholder="Area" @bind="showroom.Address" />
+            <input type="text" class="form-control mb-2" placeholder="Google Map Link" @bind="showroom.GoogleMapsLink" />
+
+        </div>
+
+
+
+        <!-- Contact Info -->
+        <h5>Contact Information</h5>
+
+        <div class="border p-3 mb-2">
+            <input type="text" class="form-control mb-2" placeholder="Phone" @bind="showroom.ContactPhone" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+            <input type="text" class="form-control mb-2" placeholder="Email" @bind="showroom.ContactEmail" />
+
+        </div>
+
+
+        <!-- Social Media -->
+        <h5>Social Media References</h5>
+
+        <div class="border p-3 mb-2">
+            <input type="url" class="form-control mb-2" placeholder="Facebook Url" @bind="showroom.FacebookUrl" />
+            <input type="url" class="form-control mb-2" placeholder="Instagram Url " @bind="showroom.InstagramUrl" />
+
+        </div>
+
+
+
+        <br />
+
+        <!-- Save Button -->
+        <button type="submit" class="btn btn-primary mt-3">Save Showroom</button>
+
+        @if (isSaved)
+        {
+            <p class="text-success mt-3">Showroom saved successfully!</p>
+        }
+    </EditForm>
+}
+
+@code {
+    private EntAboutShowroom showroom = new();
+    private bool isSaved = false;
+    private bool loading = true;
+    private bool accessDenied = false;
+    private string? UserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = client.User;
+
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+
+        UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+
+        var existingShowroom = await AboutShowroomService.GetShowroomByUserId(UserId);
+        if (existingShowroom != null)
+        {
+            accessDenied = true; // Show access denied instead of form
+            loading = false;
+            return;
+        }
+
+        showroom = new EntAboutShowroom
+        {
+            UserId = UserId,
+
+        };
+
+        loading = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        showroom.Logo = "https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png";
+        showroom.Cover = "https://placehold.co/800x300/000000/FFFFFF/png?text=your+cover+image+here";
+        await AboutShowroomService.CreateAboutShowroom(showroom);
+        isSaved = true;
+        NavigationManager.NavigateTo("/myshowroom");
+    }
+
+
+
+
+}

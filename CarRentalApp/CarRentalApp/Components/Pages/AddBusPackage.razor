@@ -1,0 +1,85 @@
+﻿@page "/addbussesspackages/{BusId}"
+@rendermode InteractiveServer
+@inject IBusService BusService
+@inject IBusPackageService BussesPackageService
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+
+@attribute [Authorize]
+
+<h3>Create Package </h3>
+
+@if (bus == null)
+{
+    <p>Loading bus details...</p>
+}
+else
+{
+    <div class="form-group">
+        <label>Make</label>
+        <input class="form-control" @bind="bus.Make" disabled />
+    </div>
+    <div class="form-group">
+        <label>Model</label>
+        <input class="form-control" @bind="bus.Model" disabled />
+    </div>
+    <div class="form-group">
+        <label>Price</label>
+        <input class="form-control" @bind="newPackage.Price" type="number" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+    </div>
+    <div class="form-group">
+        <label>Duration </label>
+        <select id="fueltype" class="form-control" @bind="newPackage.Duration">
+            <option value="">Select Duration </option>
+            <option value="1 Hour">1 Hour</option>
+            <option value="5 Hour">5 Hour</option>
+            <option value="1 Day">1 Day</option>
+            <option value="1 Week">1 Week</option>
+            <option value="1 Month">1 Month</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="With Driver" class="form-label"> With Driver</label>
+        <InputCheckbox id="With Driver" class="form-check-input" @bind-Value="newPackage.WithDriver" />
+    </div>
+    <button @onclick="CreatePackage" class="btn btn-primary">Save Package</button>
+    <NavLink class="btn btn-secondary" href="/showbussespackages">
+        Cancel
+    </NavLink>
+}
+
+@code {
+    [Parameter]
+    public string BusId { get; set; }
+
+    private EntBus? bus;
+    private EntBusPackage newPackage = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckUserAuthenticated() && await CheckService.CheckBusinessExists())
+        {
+            bus = await BusService.GetByIdAsync(BusId);
+            newPackage.BusId = BusId;
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+
+    }
+
+    private async Task CreatePackage()
+    {
+
+        newPackage.BusId = BusId;
+        newPackage.BusMake = bus.Make;
+        newPackage.BusImage = bus.Image;
+        newPackage.BusModel = bus.Model;
+        newPackage.BusinessId = await CheckService.GetBusinessIdAsync();
+
+        await DalBusPackage.CreateAsync(newPackage);
+        NavManager.NavigateTo("/showbussespackages");
+    }
+}

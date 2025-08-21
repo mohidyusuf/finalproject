@@ -1,0 +1,304 @@
+﻿@page "/addbusses/{BusId?}"
+@rendermode InteractiveServer
+@inject IBusService ServiceBus
+@inject IImageUploadService ImageUploadServices
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<EditForm Model="BusModel" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+
+    <!-- Make Dropdown (Hardcoded) -->
+    <div class="mb-3">
+        <label class="form-label">Make</label>
+        <select class="form-control" @bind="selectedMake">
+            <option value="">--- Select Make ---</option>
+            <option value="Hino">Hino</option>
+            <option value="Daewoo">Daewoo</option>
+            <option value="Mercedes">Mercedes</option>
+            <option value="Toyota">Toyota</option>
+            <option value="Volvo">Volvo</option>
+            <option value="Scania">Scania</option>
+            <option value="MAN">MAN</option>
+            <option value="Yutong">Yutong</option>
+        </select>
+        <ValidationMessage For="@(() => BusModel.Make)" />
+    </div>
+
+    <!-- Model Dropdown -->
+    <div class="mb-3">
+        <label class="form-label">Model</label>
+        <select class="form-control" @bind="selectedModel">
+            <option value="">--- Select Model ---</option>
+            @foreach (var model in filteredModels)
+            {
+                <option value="@model.Model">@model.Model</option>
+            }
+        </select>
+        <ValidationMessage For="@(() => BusModel.Model)" />
+    </div>
+
+    <!-- Color Dropdown -->
+    <div class="mb-3">
+        <label class="form-label">Color</label>
+        <select class="form-control" @bind="selectedColor">
+            <option value="">--- Select Color ---</option>
+            @foreach (var color in filteredColors)
+            {
+                <option value="@color.Color">@color.Color</option>
+            }
+        </select>
+        <ValidationMessage For="@(() => BusModel.Color)" />
+    </div>
+
+    <!-- Year -->
+    <div>
+        <label for="year" class="form-label">Year</label>
+        <InputNumber id="year" class="form-control" @bind-Value="BusModel.Year" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+        <ValidationMessage For="@(() => BusModel.Year)" />
+        @if (!string.IsNullOrEmpty(YearError))
+        {
+            <div class="text-danger mt-1">@YearError</div>
+        }
+    </div>
+
+    <!-- Registration Number -->
+    <div class="mb-3">
+        <label for="registration" class="form-label">Registration Number</label>
+        <InputText id="registration" class="form-control" @bind-Value="BusModel.RegistrationNumber" placeholder=" ABC-123" />
+        <ValidationMessage For="@(() => BusModel.RegistrationNumber)" />
+    </div>
+
+    <!-- Fuel Type -->
+    <div class="mb-3">
+        <label for="fueltype" class="form-label">Fuel Type</label>
+        <select id="fueltype" class="form-control" @bind="BusModel.FuelType">
+            <option value="">Select Fuel Type</option>
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Electric">Electric</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="CNG">CNG</option>
+            <option value="LPG">LPG</option>
+        </select>
+    </div>
+
+    <!-- Transmission -->
+    <div class="mb-3">
+        <label for="transmission" class="form-label">Transmission</label>
+        <select id="transmission" class="form-control" @bind="BusModel.Transmission">
+            <option value="">Select Transmission Type</option>
+            <option value="Automatic">Automatic</option>
+            <option value="Manual">Manual</option>
+        </select>
+    </div>
+
+    <!-- Seating Capacity -->
+    <div class="mb-3">
+        <label for="seating" class="form-label">Seating Capacity</label>
+        <InputText id="seating" class="form-control" @bind-Value="BusModel.SeatingCapacity" placeholder="eg.1,2,3" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+        <label for="description" class="form-label"> Bus Description </label>
+        <InputText id="description" class="form-control" @bind-Value="BusModel.BusDescription" placeholder="optional" />
+    </div>
+
+    <!-- Image -->
+    <div class="mb-3">
+        <label class="form-label">Bus Image</label>
+        <InputFile OnChange="HandleImageUpload" accept=".jpg,.jpeg,.png,.gif,.jfif" />
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="text-danger">@errorMessage</div>
+        }
+  @if (!string.IsNullOrEmpty(BusModel.Image))
+        {
+            <img src="@BusModel.Image" width="100" class="mt-2" />
+        }
+    </div>
+
+    <!-- Status -->
+    <div class="mb-3 form-check">
+        <InputCheckbox id="status" class="form-check-input" @bind-Value="BusModel.Status" />
+        <label for="status" class="form-check-label">Is Available</label>
+    </div>
+
+    <!-- Carrier -->
+    <div class="mb-3 form-check">
+        <InputCheckbox id="carrier" class="form-check-input" @bind-Value="BusModel.WithCarrier" />
+        <label for="carrier" class="form-check-label">With Carrier</label>
+    </div>
+
+    <!-- AC -->
+    <div class="mb-3 form-check">
+        <InputCheckbox id="hasac" class="form-check-input" @bind-Value="BusModel.IsAC" />
+        <label for="hasac" class="form-check-label">Has AC</label>
+    </div>
+
+    <!-- Bus Type -->
+    <div class="mb-3">
+        <label for="bustype" class="form-label">Bus Type</label>
+        <select id="bustype" class="form-control" @bind="BusModel.BusType">
+            <option value="">Select Bus Type</option>
+            <option value="MiniBus">MiniBus</option>
+            <option value="Luxury">Luxury</option>
+            <option value="Shuttle">Shuttle</option>
+            <option value="Transit">Transit</option>
+        </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary me-2">@ButtonName</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">@CButtonName</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? BusId { get; set; }
+
+    private string ButtonName = "";
+    private string CButtonName = "";
+    private EntBus BusModel = new EntBus();
+    private EntBusDropDown dropdownData = new EntBusDropDown();
+
+    // Filtered lists
+    private List<EntBusModels> filteredModels = new List<EntBusModels>();
+    private List<EntBusColors> filteredColors = new List<EntBusColors>();
+
+    // Backing fields for two-way binding
+    private string _selectedMake = "";
+    private string _selectedModel = "";
+    private string _selectedColor = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckBusinessExists() && await CheckService.CheckUserAuthenticated())
+        {
+            // Load dropdown data from JSON
+            dropdownData = DalBusDropDown.GetAllDropdownData();
+
+            if (BusId != null)
+            {
+                // Edit mode
+                BusModel = await ServiceBus.GetByIdAsync(BusId);
+                ButtonName = "Update";
+                CButtonName = "Cancel Update";
+
+            }
+            else
+            {
+                ButtonName = "Save Bus";
+                CButtonName = "Cancel";
+            }
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+
+    public string selectedMake
+    {
+        get => _selectedMake;
+        set
+        {
+            _selectedMake = value;
+            BusModel.Make = value;
+
+            // Filter models based on make
+            filteredModels = dropdownData.Models
+                .Where(m => m.MakeId == value)
+                .ToList();
+
+            // Reset dependent dropdowns
+            selectedModel = "";
+            selectedColor = "";
+            StateHasChanged();
+        }
+    }
+
+    public string selectedModel
+    {
+        get => _selectedModel;
+        set
+        {
+            _selectedModel = value;
+            BusModel.Model = value;
+
+            // Filter colors based on model
+            filteredColors = dropdownData.Colors
+                .Where(c => c.ModelId == value)
+                .ToList();
+
+            // Reset color selection
+            selectedColor = "";
+            StateHasChanged();
+        }
+    }
+
+    public string selectedColor
+    {
+        get => _selectedColor;
+        set
+        {
+            _selectedColor = value;
+            BusModel.Color = value;
+        }
+    }
+
+
+    public string YearError { get; set; } = string.Empty;
+
+    private async Task HandleSubmit()
+    {
+        // Reset error message
+        YearError = string.Empty;
+
+        // Validate year
+        if (BusModel.Year > DateTime.Now.Year)
+        {
+            YearError = $"Year cannot be after {DateTime.Now.Year}";
+            return;
+        }
+        if (ButtonName == "Update")
+        {
+            await ServiceBus.UpdateAsync(BusId!, BusModel);
+        }
+        else
+        {
+            BusModel.BusinessId = await CheckService.GetBusinessId();
+            await ServiceBus.CreateAsync(BusModel);
+        }
+
+        NavManager.NavigateTo("/showbusses");
+
+
+
+    }
+
+    private string errorMessage = "";
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        errorMessage = "";
+        try
+        {
+            BusModel.Image = await ImageUploadServices.UploadImageAsync(e.File, "busses");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        NavManager.NavigateTo("/showbusses");
+    }
+}

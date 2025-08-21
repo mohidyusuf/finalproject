@@ -1,0 +1,104 @@
+﻿@page "/addhiacespackages/{HiaceId}"
+@rendermode InteractiveServer
+@inject IHiaceService HiaceService
+@inject IHiacePackageService ServiceHiacePackage
+@inject NavigationManager NavManager
+@inject BusinessCheckService CheckService
+@attribute [Authorize]
+
+<h3>Create Package </h3>
+
+@if (hiace == null)
+{
+    <p>Loading hiace details...</p>
+}
+else
+{
+    <EditForm Model="newPackage" OnValidSubmit="CreatePackage">
+        <DataAnnotationsValidator />
+
+        <!-- Make (disabled) -->
+        <div class="form-group">
+            <label>Make</label>
+            <InputText class="form-control" @bind-Value="hiace.Make" disabled />
+            <ValidationMessage For="@(() => hiace.Make)" />
+        </div>
+
+        <!-- Model (disabled) -->
+        <div class="form-group">
+            <label>Model</label>
+            <InputText class="form-control" @bind-Value="hiace.Model" disabled />
+            <ValidationMessage For="@(() => hiace.Model)" />
+        </div>
+
+        <!-- Price -->
+        <div class="form-group">
+            <label>Price</label>
+            <InputNumber class="form-control" @bind-Value="newPackage.Price" oninput="this.value=this.value.replace(/[^0-9 ]/g,'')" />
+            <ValidationMessage For="@(() => newPackage.Price)" />
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+            <label>Duration</label>
+            <InputSelect class="form-control" @bind-Value="newPackage.Duration">
+                <option value="">Select Duration</option>
+                <option value="1 Hour">1 Hour</option>
+                <option value="5 Hour">5 Hour</option>
+                <option value="1 Day">1 Day</option>
+                <option value="1 Week">1 Week</option>
+                <option value="1 Month">1 Month</option>
+            </InputSelect>
+            <ValidationMessage For="@(() => newPackage.Duration)" />
+        </div>
+
+        <!-- With Driver -->
+        <div class="form-group form-check">
+            <InputCheckbox class="form-check-input" @bind-Value="newPackage.WithDriver" />
+            <label class="form-check-label">With Driver</label>
+            <ValidationMessage For="@(() => newPackage.WithDriver)" />
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Save Package</button>
+
+        <NavLink class="btn btn-secondary" href="/showhiacepackages">
+            Cancel
+        </NavLink>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public string? HiaceId { get; set; }
+
+    private EntHiace? hiace;
+    private EntHiacePackage newPackage = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await CheckService.CheckBusinessExists() && await CheckService.CheckUserAuthenticated())
+        {
+
+            hiace = await HiaceService.GetByIdAsync(HiaceId);
+            newPackage.HiaceId = HiaceId;
+        }
+        else
+        {
+            NavManager.NavigateTo("/access-denied");
+        }
+    }
+
+    private async Task CreatePackage()
+    {
+
+        newPackage.HiaceId = HiaceId;
+        newPackage.HiaceMake = hiace.Make;
+        newPackage.HiaceImage = hiace.Image;
+        newPackage.HiaceModel = hiace.Model;
+        newPackage.BusinessId = await CheckService.GetBusinessIdAsync();
+
+        await ServiceHiacePackage.CreateAsync(newPackage);
+        NavManager.NavigateTo("/showhiacepackages");
+    }
+}

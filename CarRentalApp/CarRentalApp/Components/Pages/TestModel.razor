@@ -1,0 +1,130 @@
+﻿@page "/country-city-area"
+@rendermode InteractiveServer
+<h3>Select Country, City & Area</h3>
+
+<!-- Country Dropdown -->
+<div>
+    <label>Country: </label>
+    <select @bind="selectedCountry">
+        <option value="">-- Select Country --</option>
+        @foreach (var country in CountryList)
+        {
+            <option value="@country.Country">@country.Country</option>
+        }
+    </select>
+</div>
+
+<!-- City Dropdown -->
+<div style="margin-top:10px;">
+    <label>City: </label>
+    <select @bind="selectedCity" >
+        <option value="">-- Select City --</option>
+        @foreach (var city in filteredCities)
+        {
+            <option value="@city.City">@city.City</option>
+        }
+    </select>
+</div>
+
+<!-- Area Dropdown -->
+<div style="margin-top:10px;">
+    <label>Area: </label>
+    <select @bind="selectedArea">
+        <option value="">-- Select Area --</option>
+        @foreach (var area in filteredAreas)
+        {
+            <option value="@area">@area</option>
+        }
+    </select>
+</div>
+
+<!-- Display Selected -->
+@if (!string.IsNullOrEmpty(selectedArea))
+{
+    <p style="margin-top:10px;">
+        You selected: <b>@selectedCountry</b> → <b>@selectedCity</b> → <b>@selectedArea</b>
+    </p>
+}
+
+@code {
+    // Models
+    public class CountryData
+    {
+        public string Country { get; set; }
+        public List<CityData> Cities { get; set; }
+    }
+
+    public class CityData
+    {
+        public string City { get; set; }
+        public List<string> Areas { get; set; }
+    }
+
+    // Data Source (hardcoded - swap with JSON/DAL if you want)
+    List<CountryData> CountryList = new List<CountryData>
+    {
+        new CountryData
+        {
+            Country = "Pakistan",
+            Cities = new List<CityData>
+            {
+                new CityData { City = "Karachi", Areas = new List<string> { "Gulshan-e-Iqbal", "Saddar", "Clifton" } },
+                new CityData { City = "Lahore", Areas = new List<string> { "Model Town", "DHA", "Gulberg" } }
+            }
+        },
+        new CountryData
+        {
+            Country = "UAE",
+            Cities = new List<CityData>
+            {
+                new CityData { City = "Dubai", Areas = new List<string> { "Deira", "Jumeirah", "Business Bay" } },
+                new CityData { City = "Abu Dhabi", Areas = new List<string> { "Al Zahiyah", "Khalidiyah", "Al Reem Island" } }
+            }
+        }
+    };
+
+    // Filtered lists
+    List<CityData> filteredCities = new List<CityData>();
+    List<string> filteredAreas = new List<string>();
+
+    // Backing fields
+    private string _selectedCountry = "";
+    private string _selectedCity = "";
+
+    // Bound properties with logic in setter to reset dependents
+    public string selectedCountry
+    {
+        get => _selectedCountry;
+        set
+        {
+            if (_selectedCountry == value) return;
+            _selectedCountry = value;
+
+            // load cities for selected country
+            filteredCities = CountryList.FirstOrDefault(c => c.Country == _selectedCountry)?.Cities ?? new List<CityData>();
+
+            // reset city & area selections to show placeholder
+            _selectedCity = "";
+            selectedArea = "";
+            filteredAreas = new List<string>();
+        }
+    }
+
+    public string selectedCity
+    {
+        get => _selectedCity;
+        set
+        {
+            if (_selectedCity == value) return;
+            _selectedCity = value;
+
+            // load areas for selected city
+            filteredAreas = filteredCities.FirstOrDefault(c => c.City == _selectedCity)?.Areas ?? new List<string>();
+
+            // reset area selection to show placeholder
+            selectedArea = "";
+        }
+    }
+
+    public string selectedArea { get; set; } = "";
+}

@@ -1,0 +1,152 @@
+﻿@page "/hiacedetails/{id}"
+@inject IHiaceService HiaceService
+@inject IAboutShowroomService ShowroomService
+@inject NavigationManager NavManager
+@layout UserLayout
+
+
+<div style="height: 50px;"></div>
+@if (showroom != null)
+{
+    <div class="bg-dark text-white">
+        <div class="row">
+            <div class="col-md-2 ps-5" style="margin-top:-60px">
+                <img src="@(!string.IsNullOrEmpty(showroom.Logo) ? showroom.Logo : "/images/defaultlogo.jpg")"
+                     class="rounded-circle border border-3 border-white shadow"
+                     style="width:120px;height:120px;object-fit:cover;" />
+            </div>
+            <div class="col-md-10">
+                <div class="row pt-2">
+                    <div class="col-md-4">
+                        <h2 class="fw-bold">@showroom.ShowroomName</h2>
+                    </div>
+                    <div class="col-md-4 pt-1">
+                        <span class="small">📍 @showroom.Address,@showroom.City,@showroom.Country</span>
+                    </div>
+                    <div class="col-md-4 pt-1">
+                        <span class="small pe-2"> 📞@showroom.ContactPhone </span>
+                        @if (!string.IsNullOrEmpty(showroom.ContactEmail))
+                        {
+                            <div class="d-flex align-items-center small">
+                                <span class="me-1">✉️</span>
+                                <span>@showroom.ContactEmail</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (hiace == null)
+    {
+        <p>Loading hiace details...</p>
+    }
+    else
+    {
+        <div class="card shadow-lg p-4" style="max-width: 800px; margin: auto;">
+            <div class="row g-4">
+                <!-- Hiace Image -->
+                <div class="col-md-5 text-center">
+                    <img src="@hiace.Image" alt="Hiace Image" class="img-fluid rounded"
+                         style="max-height: 250px; object-fit: cover;" />
+                </div>
+
+                <!-- Hiace Info -->
+                <div class="col-md-7">
+                    <h4>@hiace.Make @hiace.Model (@hiace.Year)</h4>
+                    <p class="text-muted">Registration: @hiace.RegistrationNumber</p>
+
+                    <dl class="row">
+                        <dt class="col-sm-4">Color</dt>
+                        <dd class="col-sm-8">@hiace.Color</dd>
+
+                        <dt class="col-sm-4">Fuel Type</dt>
+                        <dd class="col-sm-8">@hiace.FuelType</dd>
+
+                        <dt class="col-sm-4">Transmission</dt>
+                        <dd class="col-sm-8">@hiace.Transmission</dd>
+
+                        <dt class="col-sm-4">Seating</dt>
+                        <dd class="col-sm-8">@hiace.SeatingCapacity</dd>
+
+                        <dt class="col-sm-4">Cargo Capacity</dt>
+                        <dd class="col-sm-8">@hiace.CargoCapacityKg Kg</dd>
+
+                        <dt class="col-sm-4">Hiace Type</dt>
+                        <dd class="col-sm-8">@hiace.HiaceType</dd>
+
+                        <dt class="col-sm-4">AC</dt>
+                        <dd class="col-sm-8">@(hiace.IsAC ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">Carrier</dt>
+                        <dd class="col-sm-8">@(hiace.WitCarrier ? "Yes" : "No")</dd>
+
+                        @if (hiace.HiaceDescription !=null){
+                        <dt class="col-sm-4">Hiace Descriptiom</dt>
+                        <dd class="col-sm-8">@hiace.HiaceDescription</dd>
+                        }
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">@(hiace.Status ? "Available" : "Not Available")</dd>
+
+                        <dt class="col-sm-4">Created At</dt>
+                        <dd class="col-sm-8">@hiace.CreatedAt.ToLocalTime().ToString("f")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <NavLink class="btn btn-secondary" href="/searchhiacepackages">
+                ⬅ Back to search
+            </NavLink>
+            <NavLink class="btn btn-primary" href="@($"/showroomdetails/{showroom.Id}")">
+                View Showroom
+            </NavLink>
+        </div>
+
+       
+    }
+    <div style="height:60px;"></div>
+}
+
+<section class="container-fluid bg-dark fixed-bottom" style="height:60px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card bg-transparent text-secondary">
+                    <div class="card-body py-2">
+                        <div class="mb-2">
+                            <img src="/logowhitered.png" height="20" />
+                            <span class="small">&copy; 2025 GoRent. All rights reserved.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    [Parameter] public string? Id { get; set; }
+    private EntHiace? hiace;
+    private EntAboutShowroom showroom = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            hiace = await HiaceService.GetByIdAsync(Id);
+            if (hiace != null)
+            {
+                showroom = await ShowroomService.GetByBusinessId(hiace.BusinessId) ?? new EntAboutShowroom();
+            }
+        }
+    }
+
+    private void GoBack()
+    {
+        NavManager.NavigateTo("/searchhiacepackages");
+    }
+}
