@@ -23,7 +23,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Step 3: Restore all projects
+      # Step 3: Restore dependencies
       - name: Restore dependencies
         run: dotnet restore CarRentalApp/CarRentalApp.sln
 
